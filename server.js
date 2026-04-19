@@ -46,17 +46,15 @@ app.get('/', (req, res) => {
 });
 
 // 404
+
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
-app.listen(PORT, () => {
- if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`SaveZone running on http://localhost:${PORT}`);
   });
 }
 
-// Export the app for Vercel
 module.exports = app;
-});
