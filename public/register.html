@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - SaveZone</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="auth-page">
+    <nav class="navbar">
+      <a href="/" class="navbar-brand">
+        <div class="logo-icon">💰</div>
+        <span>SaveZone</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="/login" class="nav-link">Already have an account?</a>
+        <a href="/login" class="btn btn-primary">Sign In</a>
+      </div>
+    </nav>
+
+    <div class="auth-container">
+      <div class="auth-card fade-in">
+        <div class="auth-header">
+          <div class="brand-logo">💰</div>
+          <h2>Create your account</h2>
+          <p>Start comparing prices and saving money today!</p>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <form id="register-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <div class="input-group">
+              <span class="input-icon">👤</span>
+              <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" autocomplete="username" required>
+            </div>
+            <div class="field-error" id="err-username"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <div class="input-group">
+              <span class="input-icon">✏️</span>
+              <input type="text" id="name" name="name" class="form-control" placeholder="Your full name" autocomplete="name" required>
+            </div>
+            <div class="field-error" id="err-name"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <div class="input-group">
+              <span class="input-icon">📧</span>
+              <input type="email" id="email" name="email" class="form-control" placeholder="your@email.com" autocomplete="email" required>
+            </div>
+            <div class="field-error" id="err-email"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-group">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="password" name="password" class="form-control" placeholder="Min. 6 characters" autocomplete="new-password" required>
+              <button type="button" class="input-toggle" onclick="togglePassword('password', this)">👁️</button>
+            </div>
+            <div class="field-error" id="err-password"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-btn">
+            Create Account
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          Already have an account? <a href="/login">Sign in here</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .field-error { font-size: 12px; color: var(--danger); margin-top: 4px; min-height: 16px; }
+    .strength-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 6px; overflow: hidden; }
+    .strength-fill { height: 100%; border-radius: 2px; transition: all 0.3s; }
+  </style>
+
+  <script>
+    function togglePassword(id, btn) {
+      const input = document.getElementById(id);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    function showAlert(message, type = 'danger') {
+      const container = document.getElementById('alert-container');
+      container.innerHTML = `<div class="alert alert-${type}"><span>${type === 'success' ? '✅' : '⚠️'}</span> ${message}</div>`;
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+      document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors();
+      document.getElementById('alert-container').innerHTML = '';
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Creating Account...';
+
+      const formData = {
+        username: document.getElementById('username').value.trim(),
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+      };
+
+      // Client-side validation
+      let hasError = false;
+      if (formData.username.length < 3) {
+        document.getElementById('err-username').textContent = 'Username must be at least 3 characters';
+        document.getElementById('username').classList.add('error');
+        hasError = true;
+      }
+      if (!formData.name) {
+        document.getElementById('err-name').textContent = 'Full name is required';
+        document.getElementById('name').classList.add('error');
+        hasError = true;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        document.getElementById('err-email').textContent = 'Enter a valid email address';
+        document.getElementById('email').classList.add('error');
+        hasError = true;
+      }
+      if (formData.password.length < 6) {
+        document.getElementById('err-password').textContent = 'Password must be at least 6 characters';
+        document.getElementById('password').classList.add('error');
+        hasError = true;
+      }
+
+      if (hasError) {
+        btn.disabled = false;
+        btn.innerHTML = 'Create Account';
+        return;
+      }
+
+      try {
+        const res = await fetch('/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showAlert('Account created successfully! Redirecting to login...', 'success');
+          setTimeout(() => window.location.href = '/login', 1800);
+        } else {
+          const errs = data.errors || [data.message || 'Registration failed'];
+          showAlert(errs.join('<br>'));
+          btn.disabled = false;
+          btn.innerHTML = 'Create Account';
+        }
+      } catch {
+        showAlert('Network error. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = 'Create Account';
+      }
+    });
+  </script>
+</body>
+</html>

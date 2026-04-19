@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaveZone - Compare Prices, Save More</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .hero {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      align-items: center;
+      background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 50%, #fdf4ff 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);
+      bottom: -50px;
+      left: -50px;
+      border-radius: 50%;
+    }
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-text .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37,99,235,0.1);
+      color: var(--primary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .hero-text h1 {
+      font-size: 52px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      color: var(--text-dark);
+    }
+    .hero-text h1 span {
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-text p {
+      font-size: 18px;
+      color: var(--text-gray);
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+    .hero-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .price-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: var(--transition);
+      animation: fadeInUp 0.5s ease forwards;
+    }
+    .price-card:nth-child(1) { animation-delay: 0.1s; }
+    .price-card:nth-child(2) { animation-delay: 0.2s; }
+    .price-card:nth-child(3) { animation-delay: 0.3s; }
+    .price-card.cheapest {
+      border-color: var(--success);
+      background: linear-gradient(135deg, #f0fdf4, #fff);
+      box-shadow: 0 4px 20px rgba(16,185,129,0.15);
+    }
+    .price-card:hover { transform: translateX(4px); }
+    .store-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .store-amazon { background: #fff8e7; }
+    .store-flipkart { background: #fff0f6; }
+    .store-jiomart { background: #f0fff4; }
+    .price-info { flex: 1; }
+    .price-info .store-name { font-weight: 700; font-size: 15px; }
+    .price-info .product-name { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
+    .price-tag { font-size: 22px; font-weight: 800; color: var(--text-dark); }
+    .price-card.cheapest .price-tag { color: var(--success); }
+    .cheapest-badge {
+      background: var(--success);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .features-section {
+      padding: 80px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header h2 { font-size: 36px; margin-bottom: 12px; }
+    .section-header p { font-size: 17px; color: var(--text-gray); max-width: 500px; margin: 0 auto; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 32px;
+      border: 1px solid var(--border);
+      text-align: center;
+      transition: var(--transition);
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--primary); }
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 20px;
+    }
+    .feature-card h3 { font-size: 18px; margin-bottom: 10px; }
+    .feature-card p { color: var(--text-gray); font-size: 15px; line-height: 1.6; }
+
+    .cta-section {
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      padding: 80px 40px;
+      text-align: center;
+      color: #fff;
+    }
+    .cta-section h2 { font-size: 36px; margin-bottom: 16px; }
+    .cta-section p { font-size: 18px; opacity: 0.9; margin-bottom: 36px; }
+    .cta-section .btn-white {
+      background: #fff;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .cta-section .btn-white:hover { background: #f0f0f0; color: var(--primary-dark); }
+
+    footer {
+      background: var(--text-dark);
+      color: #9ca3af;
+      padding: 40px;
+      text-align: center;
+    }
+    footer .footer-brand { color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    footer p { font-size: 14px; }
+
+    @media (max-width: 900px) {
+      .hero-content { grid-template-columns: 1fr; gap: 40px; }
+      .hero-text h1 { font-size: 38px; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .hero-content { padding: 60px 20px; }
+      .hero-text h1 { font-size: 30px; }
+      .features-section { padding: 60px 20px; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <div class="logo-icon">💰</div>
+      <span>SaveZone</span>
+    </a>
+    <div class="navbar-nav">
+      <a href="/login" class="nav-link">Sign In</a>
+      <a href="/register" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="tag">🛒 Smart Price Comparison</div>
+        <h1>Compare Prices.<br><span>Save Money.</span><br>Shop Smarter.</h1>
+        <p>SaveZone compares prices across Amazon, Flipkart, and JioMart — instantly finding you the best deal on any product.</p>
+        <div class="hero-actions">
+          <a href="/register" class="btn btn-primary btn-lg">Start Saving Free</a>
+          <a href="/login" class="btn btn-outline btn-lg">Sign In</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="price-card">
+          <div class="store-logo store-amazon">🛒</div>
+          <div class="price-info">
+            <div class="store-name">Amazon</div>
+            <div class="product-name">iPhone 15 (128GB)</div>
+          </div>
+          <div class="price-tag">₹69,999</div>
+        </div>
+        <div class="price-card cheapest">
+          <div class="store-logo store-flipkart">🏪</div>
+          <div class="price-info">
+            <div class="store-name">Flipkart <span class="cheapest-badge">Best Price</span></div>
+            <div class="product-name">Apple iPhone 15 128GB</div>
+          </div>
+          <div class="price-tag">₹68,999</div>
+        </div>
+        <div class="price-card">
+          <div class="store-logo store-jiomart">🟢</div>
+          <div class="price-info">
+            <div class="store-name">JioMart</div>
+            <div class="product-name">iPhone 15 - 128GB Black</div>
+          </div>
+          <div class="price-tag">₹71,990</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2>Everything you need to save more</h2>
+      <p>Powerful features designed to help you make smarter purchasing decisions.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#eff6ff;">🔍</div>
+        <h3>Instant Comparison</h3>
+        <p>Search any product and instantly see prices from Amazon, Flipkart, and JioMart side by side.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#f0fdf4;">💚</div>
+        <h3>Lowest Price Highlight</h3>
+        <p>The cheapest option is automatically highlighted so you never miss the best deal.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#f5f3ff;">🤖</div>
+        <h3>AI Shopping Assistant</h3>
+        <p>SaveBot, our smart chatbot, helps you discover products and get personalized recommendations.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>Ready to save money on every purchase?</h2>
+    <p>Join thousands of smart shoppers who compare before they buy.</p>
+    <a href="/register" class="btn btn-white btn-lg">Create Free Account</a>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-brand">💰 SaveZone</div>
+    <p>Compare prices across top Indian e-commerce platforms and shop smarter.</p>
+    <p style="margin-top:12px;font-size:13px;">© 2024 SaveZone. All rights reserved.</p>
+  </footer>
+</body>
+</html>

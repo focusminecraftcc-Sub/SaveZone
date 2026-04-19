@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - SaveZone</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .auth-container {
+      background: linear-gradient(135deg, #1e1b4b 0%, #1d4ed8 50%, #1e1b4b 100%);
+    }
+    .auth-card { border-top: 4px solid var(--primary); }
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-container">
+      <div class="auth-card fade-in">
+        <div class="auth-header">
+          <div class="brand-logo" style="background:linear-gradient(135deg,#1e1b4b,#1d4ed8)">🛡️</div>
+          <div class="admin-badge">🔒 Admin Access Only</div>
+          <h2>Admin Portal</h2>
+          <p>Sign in with admin credentials to access the dashboard</p>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <form id="admin-login-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="username">Admin Username</label>
+            <div class="input-group">
+              <span class="input-icon">👤</span>
+              <input type="text" id="username" name="username" class="form-control" placeholder="Enter admin username" autocomplete="username" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Admin Password</label>
+            <div class="input-group">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="password" name="password" class="form-control" placeholder="Enter admin password" autocomplete="current-password" required>
+              <button type="button" class="input-toggle" onclick="togglePwd()">👁️</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-block btn-lg" id="submit-btn"
+            style="background:linear-gradient(135deg,#1e1b4b,#1d4ed8);color:#fff;border:none">
+            Access Admin Dashboard
+          </button>
+        </form>
+
+        <div class="auth-footer" style="margin-top:24px">
+          <a href="/">← Back to SaveZone</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Show URL error
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error')) {
+      document.getElementById('alert-container').innerHTML =
+        `<div class="alert alert-danger"><span>⚠️</span> ${decodeURIComponent(urlParams.get('error'))}</div>`;
+    }
+
+    function togglePwd() {
+      const input = document.getElementById('password');
+      const btn = document.querySelector('.input-toggle');
+      input.type = input.type === 'password' ? 'text' : 'password';
+      btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+    }
+
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      document.getElementById('alert-container').innerHTML = '';
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Verifying...';
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          btn.innerHTML = '✅ Access Granted';
+          window.location.href = data.redirect;
+        } else {
+          document.getElementById('alert-container').innerHTML =
+            `<div class="alert alert-danger"><span>⚠️</span> ${data.message}</div>`;
+          btn.disabled = false;
+          btn.innerHTML = 'Access Admin Dashboard';
+        }
+      } catch {
+        document.getElementById('alert-container').innerHTML =
+          '<div class="alert alert-danger"><span>⚠️</span> Connection error. Try again.</div>';
+        btn.disabled = false;
+        btn.innerHTML = 'Access Admin Dashboard';
+      }
+    });
+  </script>
+</body>
+</html>
